@@ -12,7 +12,7 @@ The technique is called `Supervised Learning`.
 
 To initiate this project, type in the terminal as the below.
 
-`git clone git@github.com:Joeycho/graduate_project-v-000.git'
+`git clone git@github.com:Joeycho/graduate_project-v-000.git`
 
 Currently, to open the webpage, type the direct path of `index.html`file in the browser.
 
