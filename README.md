@@ -16,7 +16,7 @@ To initiate this project, type in the terminal as the below.
 
 Currently, to open the webpage, type the direct path of `index.html`file in the browser.
 
-## Developement environment
+## Development environment
 
 Operating System: Ubuntu 16.04.4 LTS (32 bit)
 Web browser: Firefox 60.01 (32 bit)
