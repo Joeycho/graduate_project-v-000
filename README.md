@@ -5,7 +5,7 @@ Current one is from tutorials in Tensorflow, to recognize handwritten digits wit
 
 The technique is called `Supervised Learning`.
 
-- With the `Supervised Learning`, several models would be used and trained.
+- In the `Supervised Learning`, several models would be used and trained.
 - Each row in data consists of 5 ratings per each shop and the final selection from pet owner, such as [5,6,4,3,7,4]
 - The range of rating is from 0 to 10, and for the final selection, it will be one of integers, inclusive from 0 to 4.
 
