@@ -22,7 +22,7 @@ Currently, to open the webpage, type the direct path of `index.html`file in the 
 Operating System: Ubuntu 16.04.4 LTS (32 bit)
 Web browser: Firefox 60.01 (32 bit)
 
-##Reference
+## Reference
 
 `https://codelabs.developers.google.com/codelabs/tfjs-training-classfication/index.html#7`
 `https://github.com/olehermanse/INF3490-AI_Machine_Learning/tree/master/material/assignment2`
