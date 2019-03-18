@@ -9,15 +9,15 @@ The technique is called `Supervised Learning`.
 - Each row in data consists of 5 ratings per each shop and the final selection from pet owner, such as [5,6,4,3,7,4]
 - The range of rating is from 0 to 10, and for the final selection, it will be one of integers, inclusive from 0 to 4.
 
-##Instruction
+## Instruction
 
 To initiate this project, type in the terminal as the below.
 
-`git clone git@github.com:Joeycho/graduate_project-v-000.git'
+`git clone git@github.com:Joeycho/graduate_project-v-000.git`
 
 Currently, to open the webpage, type the direct path of `index.html`file in the browser.
 
-##Developement environment
+## Development environment
 
 Operating System: Ubuntu 16.04.4 LTS (32 bit)
 Web browser: Firefox 60.01 (32 bit)
