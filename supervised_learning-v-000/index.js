@@ -46,18 +46,28 @@ function generateData(ratingRange, numShops, numRow) {
       // Step 1. Shuffle the data
       tf.util.shuffle(data);
 
+      console.log("shuffled data before to tensor:", data);
+
       // Step 2. Convert data to Tensor
     //  const inputs = data.map(d => d.horsepower)
-      const inputs = data.map(d => d.slice(0,numShops))
-      const labels = data.map(d => d[numShops]);
+      const inputs = data.map(d => d.slice(0,numShops));
 
+      const labels = data.map( d => {
+        temparray = new Array(numShops).fill(0);
+        temparray[d[numShops]]=1;
+
+        return temparray;
+      });
 
 //      console.log("inputTensor: ",inputTensor);
       //const labelTensor = tf.tensor2d(labels, [labels.length, 1]);
+          console.log("inputs: ",inputs);
+          console.log("labels: ",labels);
 
 
-      const inputTensor = tf.tensor2d(inputs, [data.length, numShops]);
-      const labelTensor = tf.tensor2d(labels, [labels.length, 1]);
+
+      const inputTensor = tf.tensor2d(inputs, [data.length,numShops]);
+      const labelTensor = tf.tensor2d(labels, [labels.length, numShops]);
 
       //Step 3. Normalize the data to the range 0 - 1 using min-max scaling
       const inputMax = inputTensor.max();
@@ -80,15 +90,18 @@ function generateData(ratingRange, numShops, numRow) {
     });
   }
 
-  function createModel() {
+  function createModel(numShops) {
   // Create a sequential model
   const model = tf.sequential();
 
   // Add a single hidden layer
-  model.add(tf.layers.dense({inputShape: [5], units: 1, useBias: true}));
+  model.add(tf.layers.dense({inputShape: [numShops], units: 3, useBias: true}));
+
+  // Second layer
+  model.add(tf.layers.dense({units: 2, activation: 'relu'}));
 
   // Add an output layer
-  model.add(tf.layers.dense({units: 1, useBias: true}));
+  model.add(tf.layers.dense({units: 5, useBias: true}));
 
   return model;
 }
@@ -101,8 +114,8 @@ async function trainModel(model, inputs, labels) {
     metrics: ['mse'],
   });
 
-  const batchSize = 14;
-  const epochs = 30;
+  const batchSize = 50;
+  const epochs = 50;
 
   return await model.fit(inputs, labels, {
     batchSize,
@@ -116,22 +129,31 @@ async function trainModel(model, inputs, labels) {
   });
 }
 
-function testModel(model, inputData, normalizationData) {
+function testModel(model, inputData, normalizationData, numShops, numDatas) {
   const {inputMax, inputMin, labelMin, labelMax} = normalizationData;
 
   // Generate predictions for a uniform range of numbers between 0 and 1;
   // We un-normalize the data by doing the inverse of the min-max scaling
   // that we did earlier.
+  const totalNum = numShops*numDatas;
+
+  const xsi = tf.linspace(0,1,totalNum);
+  console.log("Before shuffle xsi: ",xsi);
+  const xsarray = xsi.dataSync();
+  tf.util.shuffle(xsarray);
+  console.log("After shuffle, xsarray: ",xsarray);
+  const xst = tf.tensor1d(xsarray);
+  console.log("From xsarray to xst tensor: ",xst);
+
+  xaxis = tf.linspace(1,numDatas,numDatas).dataSync();
+  console.log("xaxis x:",Array.from(xaxis));
+
+
   const [xs, preds] = tf.tidy(() => {
 
-    const xs = tf.linspace(0,1,100);
-    console.log("Before shuffle xs: ",xs);
-    const xsarray = xs.dataSync();
-    tf.util.shuffle(xsarray);
-    console.log("After shuffle, xsarray: ",xsarray);
-    const preds = model.predict(xs.reshape([20, 5]));
+        const preds = model.predict(xst.reshape([numDatas, numShops]));
 
-    const unNormXs = xs
+    const unNormXs = xst
       .mul(inputMax.sub(inputMin))
       .add(inputMin);
 
@@ -146,20 +168,44 @@ function testModel(model, inputData, normalizationData) {
   console.log("xs: ",xs);
   console.log("preds: ",preds);
 
-  const predictedPoints = Array.from(xs).map((val, i) => {
-    return {x: val, y: preds[i]}
+  const predictedPoints = Array.from(xaxis).map((val, i) => {
+    return {x: val, y: Math.floor(preds[i])}
   });
 
-  const originalPoints = inputData.map(d => ({
-    x: d.slice(0,5), y: d[5],
-  }));
+  let maxIndex = 0;
+
+  let original = [];
+
+  for (let i = 0; i < totalNum; i++) {
+
+      const seed = xsarray[i];
+      if(seed>xsarray[maxIndex]){
+          maxIndex = i;
+      };
+
+      if(i%numShops == numShops-1){
+        original.push(maxIndex%numShops);
+        maxIndex = i+1;
+      };
+  };
+
+  console.log("orginal y:",original);
+
+
+  const originalPoints = Array.from(xaxis).map((d,i) => {
+    return{x: d, y: original[i]}
+  });
+
+  console.log("predicted: ",predictedPoints);
+
+  console.log("original: ",originalPoints);
 
 
   tfvis.render.scatterplot(
     {name: 'Model Predictions vs Original Data'},
     {values: [originalPoints, predictedPoints], series: ['original', 'predicted']},
     {
-      xLabel: 'rating from 5 shops',
+      xLabel: `rating from ${numShops} shops`,
       yLabel: 'choice',
       height: 300
     }
@@ -170,7 +216,7 @@ function testModel(model, inputData, normalizationData) {
 async function run() {
 
     const numShops = 5;
-    const numDatas = 20;
+    const numDatas = 300;
     const data = generateData(10,numShops,numDatas);
 
     console.log(data);
@@ -184,17 +230,15 @@ async function run() {
     const tensorData = convertToTensor(data,numShops);
     const {inputs, labels} = tensorData;
 
-    console.log("inputs: ",inputs);
-    console.log("labels: ",labels);
 
-    const model = createModel();
+    const model = createModel(numShops);
     tfvis.show.modelSummary({name: 'Model Summary'}, model);
 
     // Train the model
     await trainModel(model, inputs, labels);
     console.log('Done Training');
 
-    testModel(model, data, tensorData);
+    testModel(model, data, tensorData,numShops, numDatas);
   }
 
   run();
