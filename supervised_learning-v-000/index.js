@@ -104,10 +104,10 @@ function generateData(ratingRange, numShops, numRow) {
   model.add(tf.layers.dense({inputShape: [numShops], units: 20, useBias: true}));
 
   // Second layer
-  model.add(tf.layers.dense({units: 18, activation: 'sigmoid'}));
+  model.add(tf.layers.dense({units: 18, activation: 'sigmoid', useBias: true}));
 
   // Add an output layer
-  model.add(tf.layers.dense({units: numShops, activation: 'sigmoid', useBias: true}));
+  model.add(tf.layers.dense({units: numShops, activation: 'sigmoid'}));
 
   return model;
 }
@@ -120,7 +120,7 @@ async function trainModel(model, inputs, labels) {
     metrics: ['mse'],
   });
 
-  const batchSize = 30;
+  const batchSize = 10;
   const epochs = 200;
 
   return await model.fit(inputs, labels, {
@@ -135,7 +135,7 @@ async function trainModel(model, inputs, labels) {
   });
 }
 
-function testModel(model, inputData, normalizationData, numShops, numDatas) {
+async function testModel(model, inputData, normalizationData, numShops, numDatas) {
   const {inputMax, inputMin, labelMin, labelMax} = normalizationData;
 
   // Generate predictions for a uniform range of numbers between 0 and 1;
@@ -245,7 +245,7 @@ function testModel(model, inputData, normalizationData, numShops, numDatas) {
 
 
   tfvis.render.scatterplot(
-    {name: 'Model Predictions vs Original Data'},
+    {name: 'Model Predictions vs Original Data', tab: 'Evaluation'},
     {values: [originalPoints, predictedPoints], series: ['original', 'predicted']},
     {
       xLabel: `rating from ${numShops} shops`,
@@ -253,13 +253,21 @@ function testModel(model, inputData, normalizationData, numShops, numDatas) {
       height: 300
     }
   );
+
+  const confusionMatrix = await tfvis.metrics.confusionMatrix(tf.tensor1d(original),tf.tensor1d(originalp));
+
+  const container = {name: 'confusionMatrix', tab: 'Evaluation'};
+
+  const choices = tf.linspace(1,numShops,numShops).arraySync();
+
+  tfvis.render.confusionMatrix(container, {values: confusionMatrix, tickLabels: Array.from(choices)});
 }
 
 
 async function run() {
 
-    const numShops = 10;
-    const numDatas = 1000;
+    const numShops = 5;
+    const numDatas = 500;
     const data = generateData(10,numShops,numDatas);
 
     console.log(data);
