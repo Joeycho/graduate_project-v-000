@@ -69,14 +69,20 @@ function generateData(ratingRange, numShops, numRow) {
       const inputTensor = tf.tensor2d(inputs, [data.length,numShops]);
       const labelTensor = tf.tensor2d(labels, [labels.length, numShops]);
 
+      console.log("labelTensor: ",labelTensor);
+
       //Step 3. Normalize the data to the range 0 - 1 using min-max scaling
       const inputMax = inputTensor.max();
       const inputMin = inputTensor.min();
       const labelMax = labelTensor.max();
       const labelMin = labelTensor.min();
 
+        console.log("input Max:",inputMax.print(),"and Min: ",inputMin.print());
+
       const normalizedInputs = inputTensor.sub(inputMin).div(inputMax.sub(inputMin));
       const normalizedLabels = labelTensor.sub(labelMin).div(labelMax.sub(labelMin));
+
+  console.log("normalizedLabels: ",normalizedLabels.print());
 
       return {
         inputs: normalizedInputs,
@@ -95,13 +101,13 @@ function generateData(ratingRange, numShops, numRow) {
   const model = tf.sequential();
 
   // Add a single hidden layer
-  model.add(tf.layers.dense({inputShape: [numShops], units: 3, useBias: true}));
+  model.add(tf.layers.dense({inputShape: [numShops], units: 20, useBias: true}));
 
   // Second layer
-  model.add(tf.layers.dense({units: 2, activation: 'relu'}));
+  model.add(tf.layers.dense({units: 18, activation: 'sigmoid'}));
 
   // Add an output layer
-  model.add(tf.layers.dense({units: 5, useBias: true}));
+  model.add(tf.layers.dense({units: numShops, activation: 'sigmoid', useBias: true}));
 
   return model;
 }
@@ -114,8 +120,8 @@ async function trainModel(model, inputs, labels) {
     metrics: ['mse'],
   });
 
-  const batchSize = 50;
-  const epochs = 50;
+  const batchSize = 30;
+  const epochs = 200;
 
   return await model.fit(inputs, labels, {
     batchSize,
@@ -143,7 +149,7 @@ function testModel(model, inputData, normalizationData, numShops, numDatas) {
   tf.util.shuffle(xsarray);
   console.log("After shuffle, xsarray: ",xsarray);
   const xst = tf.tensor1d(xsarray);
-  console.log("From xsarray to xst tensor: ",xst);
+  console.log("From xsarray to xst tensor: ",xst.print());
 
   xaxis = tf.linspace(1,numDatas,numDatas).dataSync();
   console.log("xaxis x:",Array.from(xaxis));
@@ -152,6 +158,7 @@ function testModel(model, inputData, normalizationData, numShops, numDatas) {
   const [xs, preds] = tf.tidy(() => {
 
         const preds = model.predict(xst.reshape([numDatas, numShops]));
+        console.log("Before change to unNormpreds: ",preds.print());
 
     const unNormXs = xst
       .mul(inputMax.sub(inputMin))
@@ -161,15 +168,37 @@ function testModel(model, inputData, normalizationData, numShops, numDatas) {
       .mul(labelMax.sub(labelMin))
       .add(labelMin);
 
+      console.log("After change to unNormpreds: ",unNormPreds);
+
     // Un-normalize the data
-    return [unNormXs.dataSync(), unNormPreds.dataSync()];
+    return [unNormXs.dataSync(), unNormPreds.arraySync()];
   });
 
   console.log("xs: ",xs);
   console.log("preds: ",preds);
 
+  let maxIndexp = 0;
+
+  let originalp = [];
+
+  for (let k = 0; k < numDatas; k++) {
+
+    for(let i = 0; i<numShops;i++){
+      const seed = preds[k][i];
+      if(seed>preds[k][maxIndexp]){
+          maxIndexp = i;
+      };
+
+      if(i == numShops-1){
+        originalp.push(maxIndexp);
+        maxIndexp = 0;
+      };
+    }
+
+  };
+
   const predictedPoints = Array.from(xaxis).map((val, i) => {
-    return {x: val, y: Math.floor(preds[i])}
+    return {x: val, y: originalp[i]}
   });
 
   let maxIndex = 0;
@@ -200,6 +229,20 @@ function testModel(model, inputData, normalizationData, numShops, numDatas) {
 
   console.log("original: ",originalPoints);
 
+  let ratio = 0;
+  for(let i=0;i<numDatas;i++){
+    if(predictedPoints[i]['y']==originalPoints[i]['y']){
+      ratio++;
+    };
+  }
+  ratio = ratio/numDatas*100;
+
+  console.log("Hit ratio:",ratio);
+
+  const hitratioDiv = document.getElementById('hitratio');
+
+  hitratioDiv.innerHTML +=`HIT Ratio:${ratio}%`+`<br>`;
+
 
   tfvis.render.scatterplot(
     {name: 'Model Predictions vs Original Data'},
@@ -215,12 +258,14 @@ function testModel(model, inputData, normalizationData, numShops, numDatas) {
 
 async function run() {
 
-    const numShops = 5;
-    const numDatas = 300;
+    const numShops = 10;
+    const numDatas = 1000;
     const data = generateData(10,numShops,numDatas);
 
     console.log(data);
 
+    const subtitleDiv = document.getElementById('subtitle');
+    subtitleDiv.innerHTML +=`Data should be array which contains ${numShops} randomly generated ratings and one choice`;
     const examplesDiv = document.getElementById('dataExamples');
     for (let i = 0; i< numDatas;i++){
         examplesDiv.innerHTML += `${i+1} element in data: ${data[i]}`+'<br>';
