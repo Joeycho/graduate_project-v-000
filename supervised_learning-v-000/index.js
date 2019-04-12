@@ -17,6 +17,8 @@
 
 function generateData(ratingRange, numShops, numRow) {
 
+    //Generate random numbers in the given range, and make a list,
+    //which contains them in the number of Shops and ends with the index, starting from 0 which has highest number.
     const output = [];
 
     for (let k = 0; k < numRow; k++){
@@ -35,6 +37,7 @@ function generateData(ratingRange, numShops, numRow) {
         row.push(maxIndex);
         output.push(row);
     }
+
     return output;
   }
 
@@ -43,51 +46,35 @@ function generateData(ratingRange, numShops, numRow) {
     // intermediate tensors.
 
     return tf.tidy(() => {
-      // Step 1. Shuffle the data
+      //Shuffle the data
       tf.util.shuffle(data);
 
-      console.log("shuffled data before to tensor:", data);
 
-      // Step 2. Convert data to Tensor
-    //  const inputs = data.map(d => d.horsepower)
+      //Convert data to Tensor
       const inputs = data.map(d => d.slice(0,numShops));
 
       const labels = data.map( d => {
         temparray = new Array(numShops).fill(0);
         temparray[d[numShops]]=1;
-
         return temparray;
       });
-
-//      console.log("inputTensor: ",inputTensor);
-      //const labelTensor = tf.tensor2d(labels, [labels.length, 1]);
-          console.log("inputs: ",inputs);
-          console.log("labels: ",labels);
-
-
 
       const inputTensor = tf.tensor2d(inputs, [data.length,numShops]);
       const labelTensor = tf.tensor2d(labels, [labels.length, numShops]);
 
-      console.log("labelTensor: ",labelTensor);
-
-      //Step 3. Normalize the data to the range 0 - 1 using min-max scaling
+      //Normalize the data to the range 0 - 1 using min-max scaling
       const inputMax = inputTensor.max();
       const inputMin = inputTensor.min();
       const labelMax = labelTensor.max();
       const labelMin = labelTensor.min();
 
-        console.log("input Max:",inputMax.print(),"and Min: ",inputMin.print());
-
       const normalizedInputs = inputTensor.sub(inputMin).div(inputMax.sub(inputMin));
       const normalizedLabels = labelTensor.sub(labelMin).div(labelMax.sub(labelMin));
-
-  console.log("normalizedLabels: ",normalizedLabels.print());
 
       return {
         inputs: normalizedInputs,
         labels: normalizedLabels,
-        // Return the min/max bounds so we can use them later.
+        //Return the min/max bounds so we can use them later.
         inputMax,
         inputMin,
         labelMax,
@@ -97,23 +84,23 @@ function generateData(ratingRange, numShops, numRow) {
   }
 
   function createModel(numShops) {
-  // Create a sequential model
+  //Create a sequential model
   const model = tf.sequential();
 
-  // Add a single hidden layer
+  //Add a single hidden layer
   model.add(tf.layers.dense({inputShape: [numShops], units: 20, useBias: true}));
 
-  // Second layer
+  //Add second layer
   model.add(tf.layers.dense({units: 18, activation: 'sigmoid', useBias: true}));
 
-  // Add an output layer
+  //Add an output layer
   model.add(tf.layers.dense({units: numShops, activation: 'sigmoid'}));
 
   return model;
 }
 
 async function trainModel(model, inputs, labels) {
-  // Prepare the model for training.
+  //Prepare the model for training.
   model.compile({
     optimizer: tf.train.adam(),
     loss: tf.losses.meanSquaredError,
@@ -138,9 +125,9 @@ async function trainModel(model, inputs, labels) {
 async function testModel(model, inputData, normalizationData, numShops, numDatas) {
   const {inputMax, inputMin, labelMin, labelMax} = normalizationData;
 
-  // Generate predictions for a uniform range of numbers between 0 and 1;
-  // We un-normalize the data by doing the inverse of the min-max scaling
-  // that we did earlier.
+  //Generate predictions for a uniform range of numbers between 0 and 1;
+  //We un-normalize the data by doing the inverse of the min-max scaling
+
   const totalNum = numShops*numDatas;
 
   const xsi = tf.linspace(0,1,totalNum);
@@ -170,7 +157,7 @@ async function testModel(model, inputData, normalizationData, numShops, numDatas
 
       console.log("After change to unNormpreds: ",unNormPreds);
 
-    // Un-normalize the data
+    //Un-normalize the data
     return [unNormXs.dataSync(), unNormPreds.arraySync()];
   });
 
@@ -268,30 +255,36 @@ async function run() {
 
     const numShops = 5;
     const numDatas = 500;
-    const data = generateData(10,numShops,numDatas);
+    const range = 10;
 
-    console.log(data);
+    const data = generateData(range,numShops,numDatas);
 
+    //Print subtitle in the page
     const subtitleDiv = document.getElementById('subtitle');
     subtitleDiv.innerHTML +=`Data should be array which contains ${numShops} randomly generated ratings and one choice`;
+
+    //Print each element in the generated data
     const examplesDiv = document.getElementById('dataExamples');
     for (let i = 0; i< numDatas;i++){
         examplesDiv.innerHTML += `${i+1} element in data: ${data[i]}`+'<br>';
     }
 
-    // Convert the data to a form we can use for training.
+    //Convert the data to a tensor form we can use for training.
     const tensorData = convertToTensor(data,numShops);
     const {inputs, labels} = tensorData;
 
-
+    //Create model to train
     const model = createModel(numShops);
+    //Print the status of models
     tfvis.show.modelSummary({name: 'Model Summary'}, model);
 
-    // Train the model
+    //Train the model
     await trainModel(model, inputs, labels);
     console.log('Done Training');
 
+    //Test the model
     testModel(model, data, tensorData,numShops, numDatas);
+
   }
 
   run();
