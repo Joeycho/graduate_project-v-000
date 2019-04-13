@@ -253,8 +253,8 @@ async function testModel(model, inputData, normalizationData, numShops, numDatas
 
 async function run() {
 
-    const numShops = 5;
-    const numDatas = 500;
+    const numShops = 10;
+    const numDatas = 1000;
     const range = 10;
 
     const data = generateData(range,numShops,numDatas);
