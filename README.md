@@ -3,13 +3,7 @@ Test machine learning techniques with TensorFlow libraries.
 
 Current one in this folder is from tutorials in Tensorflow, to recognize handwritten digits with a convolutional neural network.
 
-The other one is located in the `Supervised Learning` folder. There are 3 files in the folder.
-
-The technique which was used in the folder, is called `Supervised Learning`.
-
-- In the `Supervised Learning`, several models would be used and trained.
-- Each element in data consists of ratings per each shop and the final selection from pet owner. 
-- The range of rating could be from 0 to `the given number`, and for the final selection, it will be one of integers, inclusive from 0 to 4. For example, when the number of shops is 5, and the range is 10, a possible element would be [5,6,4,3,7,4].
+The other one is called the `Supervised_Learning-v-000` folder. The description and instruction are written on the `README.md` file in the folder.
 
 ## Instruction
 
