@@ -13,17 +13,21 @@ To initiate this project, type in the terminal as the below.
 
 `git clone git@github.com:Joeycho/graduate_project-v-000.git`
 
-Currently, to open the webpage, type the direct path of `index.html`file in the browser possibly only worked in Firefox.
+To open the webpage, type the direct path of `index.html`file in the browser.
 
-In chrome, it has error message.
+If you get the following error message,
 
 `Access to Script at 'file:///.../graduate_project-v-000/script.js' from origin 'null' has been blocked by CORS policy: Invalid response. Origin 'null' is therefore not allowed access.`
 
-From a tutorial guide, it is recommended to install http-server instead to run the server.
-https://www.npmjs.com/package/http-server
+Try to use http-server, to run the application on the server.
+
 `npm install http-server -g`
 
-In addition, it is required to clear cached image and files and cookies from Chrome browser.
+The detail information for installation could be found in the below website.
+
+https://www.npmjs.com/package/http-server
+
+In addition, it is would be required to clear cached image and files and cookies each time you updates the code.
 
 
 ## Development environment
@@ -34,6 +38,6 @@ Web browser: Firefox 60.01 (32 bit), Chrome 67.0.3396.87 (64 bit)
 
 ## Reference
 
-`https://codelabs.developers.google.com/codelabs/tfjs-training-classfication/index.html#7`
+https://codelabs.developers.google.com/codelabs/tfjs-training-classfication/index.html#7
 
-`https://github.com/olehermanse/INF3490-AI_Machine_Learning/tree/master/material/assignment2`
+https://github.com/olehermanse/INF3490-AI_Machine_Learning/tree/master/material/assignment2
