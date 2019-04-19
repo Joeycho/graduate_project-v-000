@@ -1,9 +1,11 @@
-# graduate_project-v-000
-Test machine learning techniques with TensorFlow libraries.
+# supervised_learning-v-000
+Supervised learning with TensorFlow libraries.
 
-Current one in this folder is from tutorials in Tensorflow, to recognize handwritten digits with a convolutional neural network.
+The technique which was used in this folder, is called `Supervised Learning`.
 
-The other one is called the `Supervised_Learning-v-000` folder. The description and instruction are written on the `README.md` file in the folder.
+- In the `Supervised Learning`, several models could be used and trained.
+- Each element in data consists of ratings per each shop and the final selection from pet owner. 
+- The range of rating could be from 0 to `the given number`, and for the final selection, it will be one of integers, inclusive from 0 to 4. For example, when the number of shops is 5, and the range is 10, a possible element would be [5,6,4,3,7,4].
 
 ## Instruction
 
