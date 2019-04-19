@@ -39,4 +39,5 @@ Web browser: Firefox 60.01 (32 bit), Chrome 67.0.3396.87 (64 bit)
 ## Reference
 
 `https://codelabs.developers.google.com/codelabs/tfjs-training-classfication/index.html#7`
+
 `https://github.com/olehermanse/INF3490-AI_Machine_Learning/tree/master/material/assignment2`
