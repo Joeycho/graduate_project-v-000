@@ -1,13 +1,15 @@
 # graduate_project-v-000
 Test machine learning techniques with TensorFlow libraries.
 
-Current one is from tutorials in Tensorflow, to recognize handwritten digits with a convolutional neural network.
+Current one in this folder is from tutorials in Tensorflow, to recognize handwritten digits with a convolutional neural network.
 
-The technique is called `Supervised Learning`.
+The other one is located in the `Supervised Learning` folder. There are 3 files in the folder.
+
+The technique which was used in the folder, is called `Supervised Learning`.
 
 - In the `Supervised Learning`, several models would be used and trained.
-- Each row in data consists of 5 ratings per each shop and the final selection from pet owner, such as [5,6,4,3,7,4]
-- The range of rating is from 0 to 10, and for the final selection, it will be one of integers, inclusive from 0 to 4.
+- Each element in data consists of ratings per each shop and the final selection from pet owner. 
+- The range of rating could be from 0 to `the given number`, and for the final selection, it will be one of integers, inclusive from 0 to 4. For example, when the number of shops is 5, and the range is 10, a possible element would be [5,6,4,3,7,4].
 
 ## Instruction
 
@@ -21,7 +23,7 @@ In chrome, it has error message.
 
 `Access to Script at 'file:///.../graduate_project-v-000/script.js' from origin 'null' has been blocked by CORS policy: Invalid response. Origin 'null' is therefore not allowed access.`
 
-As a tutorial guide, it is recommended to install http-server instead to run the server.
+From a tutorial guide, it is recommended to install http-server instead to run the server.
 https://www.npmjs.com/package/http-server
 `npm install http-server -g`
 
@@ -31,6 +33,7 @@ In addition, it is required to clear cached image and files and cookies from Chr
 ## Development environment
 
 Operating System: Ubuntu 16.04.4 LTS (32 bit), MAC OS 10.13.1 (64 bit)
+
 Web browser: Firefox 60.01 (32 bit), Chrome 67.0.3396.87 (64 bit)
 
 ## Reference
