@@ -15,29 +15,31 @@
  * =============================================================================
  */
 
-function generateData(ratingRange, numShops, numRow) {
+function generateData(ratingRange, numShops, numElements) {
 
-    //Generate random numbers in the given range, and make a list,
-    //which contains them in the number of Shops and ends with the index, starting from 0 which has highest number.
+    //Generate random numbers in the given range, and make a element,
+    //which contains them in the number of Shops and ends with the index (0 ~ numShops-1),which has highest number.
+    //Add elements as much as numElements counts.
+    //One data consists of several elements and each element consists of generated numbers and index.
+
     const output = [];
 
-    for (let k = 0; k < numRow; k++){
-    const row = [];
+    for (let k = 0; k < numElements; k++){
+    const element = [];
         let maxIndex = 0;
         for (let i = 0; i < numShops; i++) {
             const seed = Math.round(Math.random() * ratingRange*100)/100;
 
-            row.push(seed);
+            element.push(seed);
 
-            if(seed>row[maxIndex]){
+            if(seed>element[maxIndex]){
                 maxIndex = i;
             }
         };
 
-        row.push(maxIndex);
-        output.push(row);
+        element.push(maxIndex);
+        output.push(element);
     }
-
     return output;
   }
 
@@ -122,13 +124,13 @@ async function trainModel(model, inputs, labels) {
   });
 }
 
-async function testModel(model, inputData, normalizationData, numShops, numDatas) {
+async function testModel(model, inputData, normalizationData, numShops, numElements) {
   const {inputMax, inputMin, labelMin, labelMax} = normalizationData;
 
   //Generate predictions for a uniform range of numbers between 0 and 1;
   //We un-normalize the data by doing the inverse of the min-max scaling
 
-  const totalNum = numShops*numDatas;
+  const totalNum = numShops*numElements;
 
   const xsi = tf.linspace(0,1,totalNum);
   console.log("Before shuffle xsi: ",xsi);
@@ -138,13 +140,13 @@ async function testModel(model, inputData, normalizationData, numShops, numDatas
   const xst = tf.tensor1d(xsarray);
   console.log("From xsarray to xst tensor: ",xst.print());
 
-  xaxis = tf.linspace(1,numDatas,numDatas).dataSync();
+  xaxis = tf.linspace(1,numElements,numElements).dataSync();
   console.log("xaxis x:",Array.from(xaxis));
 
 
   const [xs, preds] = tf.tidy(() => {
 
-        const preds = model.predict(xst.reshape([numDatas, numShops]));
+        const preds = model.predict(xst.reshape([numElements, numShops]));
         console.log("Before change to unNormpreds: ",preds.print());
 
     const unNormXs = xst
@@ -168,7 +170,7 @@ async function testModel(model, inputData, normalizationData, numShops, numDatas
 
   let originalp = [];
 
-  for (let k = 0; k < numDatas; k++) {
+  for (let k = 0; k < numElements; k++) {
 
     for(let i = 0; i<numShops;i++){
       const seed = preds[k][i];
@@ -217,12 +219,12 @@ async function testModel(model, inputData, normalizationData, numShops, numDatas
   console.log("original: ",originalPoints);
 
   let ratio = 0;
-  for(let i=0;i<numDatas;i++){
+  for(let i=0;i<numElements;i++){
     if(predictedPoints[i]['y']==originalPoints[i]['y']){
       ratio++;
     };
   }
-  ratio = ratio/numDatas*100;
+  ratio = ratio/numElements*100;
 
   console.log("Hit ratio:",ratio);
 
@@ -253,11 +255,11 @@ async function testModel(model, inputData, normalizationData, numShops, numDatas
 
 async function run() {
 
-    const numShops = 10;
-    const numDatas = 1000;
-    const range = 10;
+    const numShops = 5;
+    const numElements = 500;
+    const range = 100;
 
-    const data = generateData(range,numShops,numDatas);
+    const data = generateData(range,numShops,numElements);
 
     //Print subtitle in the page
     const subtitleDiv = document.getElementById('subtitle');
@@ -265,7 +267,7 @@ async function run() {
 
     //Print each element in the generated data
     const examplesDiv = document.getElementById('dataExamples');
-    for (let i = 0; i< numDatas;i++){
+    for (let i = 0; i< numElements;i++){
         examplesDiv.innerHTML += `${i+1} element in data: ${data[i]}`+'<br>';
     }
 
@@ -283,7 +285,7 @@ async function run() {
     console.log('Done Training');
 
     //Test the model
-    testModel(model, data, tensorData,numShops, numDatas);
+    testModel(model, data, tensorData,numShops, numElements);
 
   }
 
