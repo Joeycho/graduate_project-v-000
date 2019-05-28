@@ -1,9 +1,11 @@
-# graduate_project-v-000
-Test machine learning techniques with TensorFlow libraries.
+# supervised_learning-v-000
+Supervised learning with TensorFlow libraries.
 
-Current one in this folder is from tutorials in Tensorflow, to recognize handwritten digits with a convolutional neural network.
+The technique which was used in this folder, is called `Supervised Learning`.
 
-The other one is called the `Supervised_Learning-v-000` folder. The description and instruction are written on the `README.md` file in the folder.
+- In the `Supervised Learning`, several models could be used and trained.
+- Each element in data consists of ratings per each shop and the final selection from pet owner. 
+- The range of rating could be from 0 to `the given number`, and for the final selection, it will be one of integers, inclusive from 0 to 4. For example, when the number of shops is 5, and the range is 10, a possible element would be [5,6,4,3,7,4].
 
 ## Instruction
 
@@ -11,17 +13,21 @@ To initiate this project, type in the terminal as the below.
 
 `git clone git@github.com:Joeycho/graduate_project-v-000.git`
 
-Currently, to open the webpage, type the direct path of `index.html`file in the browser possibly only worked in Firefox.
+To open the webpage, type the direct path of `index.html`file in the browser.
 
-In chrome, it has error message.
+If you get the following error message,
 
 `Access to Script at 'file:///.../graduate_project-v-000/script.js' from origin 'null' has been blocked by CORS policy: Invalid response. Origin 'null' is therefore not allowed access.`
 
-From a tutorial guide, it is recommended to install http-server instead to run the server.
-https://www.npmjs.com/package/http-server
+Try to use http-server, to run the application on the server.
+
 `npm install http-server -g`
 
-In addition, it is required to clear cached image and files and cookies from Chrome browser.
+The detail information for installation could be found in the below website.
+
+https://www.npmjs.com/package/http-server
+
+In addition, it is would be required to clear cached image and files and cookies each time you updates the code.
 
 
 ## Development environment
