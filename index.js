@@ -101,7 +101,7 @@ function generateData(ratingRange, numShops, numElements) {
   return model;
 }
 
-async function trainModel(model, inputs, labels) {
+async function trainModel(model, inputs, labels, batchS, epocs) {
   //Prepare the model for training.
   model.compile({
     optimizer: tf.train.adam(),
@@ -109,8 +109,8 @@ async function trainModel(model, inputs, labels) {
     metrics: ['mse'],
   });
 
-  const batchSize = 10;
-  const epochs = 200;
+  const batchSize = batchS;
+  const epochs = epocs;
 
   return await model.fit(inputs, labels, {
     batchSize,
@@ -232,9 +232,10 @@ async function testModel(model, inputData, normalizationData, numShops, numEleme
 
   hitratioDiv.innerHTML +=`HIT Ratio:${ratio}%`+`<br>`;
 
-
-  tfvis.render.scatterplot(
-    {name: 'Model Predictions vs Original Data', tab: 'Evaluation'},
+  const compareContainer = document.getElementById('compareResult');
+ //    {name: 'Model Predictions vs Original Data', tab: 'Evaluation'},
+ tfvis.render.scatterplot(
+    compareContainer, 
     {values: [originalPoints, predictedPoints], series: ['original', 'predicted']},
     {
       xLabel: `rating from ${numShops} shops`,
@@ -245,17 +246,59 @@ async function testModel(model, inputData, normalizationData, numShops, numEleme
 
   const confusionMatrix = await tfvis.metrics.confusionMatrix(tf.tensor1d(original),tf.tensor1d(originalp));
 
-  const container = {name: 'confusionMatrix', tab: 'Evaluation'};
+//  const container = {name: 'confusionMatrix', tab: 'Evaluation'};
+  const confusionContainer = document.getElementById('confusionContainer');
 
   const choices = tf.linspace(1,numShops,numShops).arraySync();
 
-  tfvis.render.confusionMatrix(container, {values: confusionMatrix, tickLabels: Array.from(choices)});
+  tfvis.render.confusionMatrix(confusionContainer, {values: confusionMatrix, tickLabels: Array.from(choices)});
 }
 
 
 async function run() {
+ 
+ document.getElementById('trainModel').addEventListener('click', async () => {
+   
+    const batchsize = +(document.getElementById('batchsize')).value;
+    const epochs = +(document.getElementById('epochs')).value;
+    const numofshops = +(document.getElementById('numofshops')).value;
+    const numofelements = +(document.getElementById('numofelements')).value;
+    const rangeofrating = +(document.getElementById('rangeofrating')).value;
 
-    const numShops = 5;
+/*    // Do some checks on the user-specified parameters.
+    const status = document.getElementById('trainStatus');
+    if (digits < 1 || digits > 5) {
+      status.textContent = 'digits must be >= 1 and <= 5';
+      return;
+    }
+    const trainingSizeLimit = Math.pow(Math.pow(10, digits), 2);
+    if (trainingSize > trainingSizeLimit) {
+      status.textContent =
+          `With digits = ${digits}, you cannot have more than ` +
+          `${trainingSizeLimit} examples`;
+      return;
+    }*/
+
+   const data = generateData(rangeofrating,numofshops,numofelements);
+
+    //Convert the data to a tensor form we can use for training.
+    const tensorData = convertToTensor(data,numofshops);
+    const {inputs, labels} = tensorData;
+
+    //Create model to train
+    const model = createModel(numofshops);
+    //Print the status of models
+    tfvis.show.modelSummary({name: 'Model Summary'}, model);
+
+    //Train the model
+    await trainModel(model, inputs, labels,batchsize, epochs);
+    console.log('Done Training');
+
+    //Test the model
+    testModel(model, data, tensorData,numofshops, numofelements);
+
+  });
+/*    const numShops = 5;
     const numElements = 500;
     const range = 100;
 
@@ -285,7 +328,7 @@ async function run() {
     console.log('Done Training');
 
     //Test the model
-    testModel(model, data, tensorData,numShops, numElements);
+    testModel(model, data, tensorData,numShops, numElements);*/
 
   }
 

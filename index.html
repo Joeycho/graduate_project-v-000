@@ -31,9 +31,72 @@ limitations under the License.
     </section>
   </div>
 
-  <p id="dataExamples"></p>
+<!--  <p id="dataExamples"></p> -->
 
-  <p id="hitratio"></p>
+
+  <div>
+      <section>
+        <p class='section-head'>Instructions</p>
+        <p>
+          Click the "Train Model" to start the model training button. You can edit the
+          parameters used to train the model as well.
+        </p>
+      </section>
+
+      <div class="controls with-rows">
+        <div class="settings">
+          <div class="setting">
+            <span class="setting-label">Batch Size:</span>
+            <input id="batchsize" value="10"></input>
+          </div>
+          <div class="setting">
+            <span class="setting-label">Epochs:</span>
+            <input id="epochs" value="200"></input>
+          </div>
+          <div class="setting">
+            <span class="setting-label">The number of shops:</span>
+            <input id="numofshops" value="5"></input>
+       </div>
+          <div class="setting">
+            <span class="setting-label">The number of elements:</span>
+            <input id="numofelements" value="500"></input>
+          </div>
+         <div class="setting">
+            <span class="setting-label">Range of rating:</span>
+            <input id="rangeofrating" value="10"></input>
+          </div>
+        </div>
+
+        <div>
+          <span>
+            <button class="btn-primary" id="trainModel">Train Model</button>
+          </span>
+        </div>
+      </div>
+
+
+      <section>
+        <p class='section-head'>Training Progress</p>
+        <p id="trainStatus"></p>
+        <div class='with-cols'>
+          <div id="lossChart"></div>
+          <div id="accuracyChart"></div>
+          <!-- <div id="examplesPerSecCanvas"></div> -->
+        </div>
+      </section>
+
+      <section>
+        <p class='section-head'>Test Result</p>
+         <div class='with-cols'>
+          <div id="compareResult"></div>
+          <div id="confusionContainer"></div>
+          <!-- <div id="examplesPerSecCanvas"></div> -->
+        </div>
+      </section>
+ 
+ <p id="hitratio"></p>
+
+    </div>
 
 </body>
 <!-- Import TensorFlow.js -->
