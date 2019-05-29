@@ -111,13 +111,17 @@ async function trainModel(model, inputs, labels, batchS, epocs) {
 
   const batchSize = batchS;
   const epochs = epocs;
+ 
+  const lossContainer = document.getElementById('lossChart');
 
   return await model.fit(inputs, labels, {
     batchSize,
     epochs,
     shuffle: true,
+//     { name: 'Training Performance' },
+
     callbacks: tfvis.show.fitCallbacks(
-      { name: 'Training Performance' },
+      lossContainer,
       ['loss', 'mse'],
       { height: 300, callbacks: ['onEpochEnd'] }
     )
@@ -230,7 +234,7 @@ async function testModel(model, inputData, normalizationData, numShops, numEleme
 
   const hitratioDiv = document.getElementById('hitratio');
 
-  hitratioDiv.innerHTML +=`HIT Ratio:${ratio}%`+`<br>`;
+  hitratioDiv.innerHTML =`HIT Ratio:${ratio}%`+`<br>`;
 
   const compareContainer = document.getElementById('compareResult');
  //    {name: 'Model Predictions vs Original Data', tab: 'Evaluation'},

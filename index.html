@@ -22,12 +22,25 @@ limitations under the License.
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
+<style>
+  .setting {
+    padding: 6px;
+  }
+  #trainModel {
+    margin-top: 12px;
+  }
+  .setting-label {
+    display: inline-block;
+    width: 12em;
+  }
+  
+</style>
 
 <body>
   <div class='tfjs-example-container centered-container'>
     <section class='title-area'>
-      <h1>Generate Data before the tensor</h1>
-      <p id='subtitle'></p>
+      <h1>A classification application using Tensorflow.js</h1>
+      <p id='subtitle'>Logic to be trained: pick up the shop which has the highest rating</p>
     </section>
   </div>
 
